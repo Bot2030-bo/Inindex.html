@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICHANCY CASINO</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Tajawal,sans-serif;
+}
+
+body{
+background:radial-gradient(circle at top,#1e293b,#020617);
+color:#fff;
+min-height:100vh;
+overflow-x:hidden;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+padding:15px;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+border-radius:20px;
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(10px);
+border:1px solid rgba(255,215,0,.2);
+margin-bottom:15px;
+}
+
+.logo{
+font-size:28px;
+font-weight:bold;
+color:gold;
+text-shadow:0 0 15px gold;
+}
+
+.balance-box{
+background:#000;
+padding:10px 15px;
+border-radius:15px;
+color:gold;
+font-weight:bold;
+}
+
+.stats{
+display:flex;
+justify-content:space-between;
+gap:10px;
+margin-bottom:20px;
+}
+
+.stat{
+flex:1;
+background:rgba(255,255,255,.05);
+padding:12px;
+border-radius:15px;
+text-align:center;
+}
+
+.wheel-area{
+position:relative;
+width:340px;
+height:340px;
+margin:20px auto;
+}
+
+#wheel{
+width:100%;
+height:100%;
+border-radius:50%;
+box-shadow:0 0 30px rgba(255,215,0,.5);
+transition:transform 5s cubic-bezier(.17,.67,.13,.99);
+background:#111827;
+}
+
+.pointer{
+position:absolute;
+top:-18px;
+left:50%;
+transform:translateX(-50%);
+width:0;
+height:0;
+border-left:20px solid transparent;
+border-right:20px solid transparent;
+border-top:50px solid gold;
+z-index:10;
+}
+
+.spin-btn{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:100px;
+height:100px;
+border-radius:50%;
+border:none;
+background:linear-gradient(145deg,gold,orange);
+font-size:22px;
+font-weight:bold;
+cursor:pointer;
+box-shadow:0 0 20px rgba(255,215,0,.6);
+}
+
+.controls{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-top:25px;
+}
+
+.controls button,
+.admin-panel button{
+padding:14px;
+border:none;
+border-radius:15px;
+background:linear-gradient(145deg,#1e293b,#0f172a);
+color:#fff;
+font-weight:bold;
+cursor:pointer;
+}
+
+.admin-panel{
+margin-top:25px;
+background:rgba(255,255,255,.05);
+padding:20px;
+border-radius:20px;
+display:none;
+}
+
+.admin-panel input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:12px;
+background:#0f172a;
+color:#fff;
+}
+
+.message{
+margin-top:20px;
+padding:15px;
+border-radius:15px;
+display:none;
+text-align:center;
+font-weight:bold;
+}
+
+.success{
+background:#14532d;
+}
+
+.error{
+background:#7f1d1d;
+}
+
+.login-screen{
+position:fixed;
+inset:0;
+background:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:99999;
+}
+
+.login-box{
+width:90%;
+max-width:380px;
+background:#111827;
+padding:30px;
+border-radius:25px;
+border:1px solid gold;
+}
+
+.login-box h1{
+text-align:center;
+margin-bottom:20px;
+color:gold;
+}
+
+.login-box input{
+width:100%;
+padding:14px;
+margin-bottom:12px;
+border:none;
+border-radius:14px;
+background:#0f172a;
+color:#fff;
+}
+
+.login-box button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+background:gold;
+font-weight:bold;
+margin-top:10px;
+cursor:pointer;
+color:#000;
+}
+
+.hidden{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-screen" id="loginScreen">
+
+<div class="login-box">
+
+<h1>👑 ICHANCY</h1>
+
+<input type="text" id="username" placeholder="اسم المستخدم">
+
+<input type="password" id="password" placeholder="كلمة المرور">
+
+<button onclick="loginNormal()">تسجيل دخول</button>
+
+<button onclick="signup()">إنشاء حساب</button>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<div class="topbar">
+
+<div class="logo">👑 ICHANCY</div>
+
+<div class="balance-box">
+💰 <span id="balance">0</span>
+</div>
+
+</div>
+
+<div class="stats">
+
+<div class="stat">
+🟢 <span id="onlineUsers">0</span>
+</div>
+
+<div class="stat">
+🏆 <span id="lastWinner">---</span>
+</div>
+
+</div>
+
+<div class="wheel-area">
+
+<div class="pointer"></div>
+
+<canvas id="wheel" width="500" height="500"></canvas>
+
+<button class="spin-btn" onclick="spinWheel()">
+SPIN
+</button>
+
+</div>
+
+<div class="controls">
+
+<button onclick="redeemGift()">
+🎁 كود
+</button>
+
+<button onclick="withdraw()">
+💸 سحب
+</button>
+
+<button onclick="logout()">
+🚪 خروج
+</button>
+
+</div>
+
+<div class="message" id="message"></div>
+
+<div class="admin-panel" id="adminPanel">
+
+<h2>👑 لوحة الإدارة</h2>
+
+<input type="number" id="giftAmount" placeholder="قيمة الكود">
+
+<button onclick="generateGiftCode()">
+إنشاء كود
+</button>
+
+<input type="text" id="targetUser" placeholder="Telegram ID">
+
+<input type="number" id="chargeAmount" placeholder="الرصيد">
+
+<button onclick="chargeUser()">
+شحن مستخدم
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const API_BASE = "https://Kingrodai99.pythonanywhere.com/api";
+
+const ADMIN_ID = 123456789;
+
+let currentUser = null;
+
+let spinning = false;
+
+let rotation = 0;
+
+const canvas = document.getElementById("wheel");
+
+const ctx = canvas.getContext("2d");
+
+const wheelItems = [
+
+{value:0,color:"#111827"},
+
+{value:1000,color:"#f59e0b"},
+
+{value:0,color:"#1e293b"},
+
+{value:5000,color:"#facc15"},
+
+{value:0,color:"#0f172a"},
+
+{value:30000,color:"#f97316"}
+
+];
+
+function drawWheel(){
+
+ctx.clearRect(0,0,500,500);
+
+wheelItems.forEach((item,index)=>{
+
+const angle = (Math.PI*2)/wheelItems.length;
+
+const start = index*angle;
+
+const end = start+angle;
+
+ctx.beginPath();
+
+ctx.moveTo(250,250);
+
+ctx.arc(250,250,240,start,end);
+
+ctx.fillStyle = item.color;
+
+ctx.fill();
+
+ctx.save();
+
+ctx.translate(250,250);
+
+ctx.rotate(start+angle/2);
+
+ctx.fillStyle = "white";
+
+ctx.font = "bold 24px Arial";
+
+ctx.fillText(item.value,120,10);
+
+ctx.restore();
+
+});
+
+}
+
+drawWheel();
+
+function showMessage(text,type="success"){
+
+const box = document.getElementById("message");
+
+box.innerHTML = text;
+
+box.className = "message "+type;
+
+box.style.display = "block";
+
+setTimeout(()=>{
+
+box.style.display = "none";
+
+},3000);
+
+}
+
+async function signup(){
+
+const username = document.getElementById("username").value;
+
+const password = document.getElementById("password").value;
+
+try{
+
+const response = await fetch(API_BASE + "/website/register",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+username,
+
+password
+
+})
+
+});
+
+const data = await response.json();
+
+showMessage(data.message || "تم إنشاء الحساب");
+
+}catch(err){
+
+showMessage("فشل الاتصال","error");
+
+}
+
+}
+
+async function loginNormal(){
+
+const username = document.getElementById("username").value;
+
+const password = document.getElementById("password").value;
+
+try{
+
+const response = await fetch(API_BASE + "/website/login",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+username,
+
+password
+
+})
+
+});
+
+const data = await response.json();
+
+if(!data.success){
+
+showMessage("بيانات خاطئة","error");
+
+return;
+
+}
+
+currentUser = data.user;
+
+finishLogin();
+
+}catch(err){
+
+showMessage("فشل الاتصال","error");
+
+}
+
+}
+
+function finishLogin(){
+
+updateBalance(currentUser.balance);
+
+document.getElementById("loginScreen").style.display = "none";
+
+if(currentUser.telegram_id == ADMIN_ID){
+
+document.getElementById("adminPanel").style.display = "block";
+
+}else{
+
+document.getElementById("adminPanel").remove();
+
+}
+
+}
+
+async function telegramAutoLogin(){
+
+if(window.Telegram && Telegram.WebApp){
+
+Telegram.WebApp.expand();
+
+const tg = Telegram.WebApp.initDataUnsafe;
+
+if(tg.user){
+
+try{
+
+const response = await fetch(API_BASE + "/website/telegram_login",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+telegram_id:tg.user.id,
+
+username:tg.user.username || "telegram_user"
+
+})
+
+});
+
+const data = await response.json();
+
+if(data.success){
+
+currentUser = data.user;
+
+finishLogin();
+
+}
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+}
+
+}
+
+telegramAutoLogin();
+
+function updateBalance(amount){
+
+document.getElementById("balance").innerText = amount;
+
+}
+
+async function spinWheel(){
+
+if(spinning) return;
+
+if(!currentUser){
+
+showMessage("سجل الدخول","error");
+
+return;
+
+}
+
+if(currentUser.balance < 2500){
+
+showMessage("الرصيد غير كافي","error");
+
+return;
+
+}
+
+spinning = true;
+
+try{
+
+const response = await fetch(API_BASE + "/website/spin",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+telegram_id:currentUser.telegram_id
+
+})
+
+});
+
+const data = await response.json();
+
+const prize = data.prize;
+
+const balance = data.balance;
+
+let targetIndex = wheelItems.findIndex(x=>x.value == prize);
+
+if(targetIndex < 0){
+
+targetIndex = 0;
+
+}
+
+const sectorAngle = 360 / wheelItems.length;
+
+const stopAngle = targetIndex * sectorAngle;
+
+rotation += 360*8 + stopAngle;
+
+canvas.style.transform = `rotate(${rotation}deg)`;
+
+setTimeout(()=>{
+
+currentUser.balance = balance;
+
+updateBalance(balance);
+
+if(prize > 0){
+
+showMessage(`🎉 ربحت ${prize}`);
+
+document.getElementById("lastWinner").innerText =
+currentUser.username || currentUser.telegram_id;
+
+}else{
+
+showMessage("😢 خسرت","error");
+
+}
+
+spinning = false;
+
+},5000);
+
+}catch(err){
+
+showMessage("فشل الاتصال","error");
+
+spinning = false;
+
+}
+
+}
+
+async function withdraw(){
+
+try{
+
+const response = await fetch(API_BASE + "/website/withdraw",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+telegram_id:currentUser.telegram_id
+
+})
+
+});
+
+const data = await response.json();
+
+if(data.success){
+
+showMessage("كود السحب: " + data.code);
+
+}else{
+
+showMessage(data.message,"error");
+
+}
+
+}catch(err){
+
+showMessage("فشل الاتصال","error");
+
+}
+
+}
+
+async function generateGiftCode(){
+
+const amount = document.getElementById("giftAmount").value;
+
+try{
+
+const response = await fetch(API_BASE + "/admin/create_gift",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+telegram_id:currentUser.telegram_id,
+
+amount
+
+})
+
+});
+
+const data = await response.json();
+
+showMessage(data.code || "تم إنشاء الكود");
+
+}catch(err){
+
+showMessage("فشل الاتصال","error");
+
+}
+
+}
+
+async function redeemGift(){
+
+const code = prompt("أدخل الكود");
+
+if(!code) return;
+
+try{
+
+const response = await fetch(API_BASE + "/website/redeem_gift",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+telegram_id:currentUser.telegram_id,
+
+code
+
+})
+
+});
+
+const data = await response.json();
+
+if(data.success){
+
+currentUser.balance = data.balance;
+
+updateBalance(data.balance);
+
+showMessage("تم استخدام الكود");
+
+}else{
+
+showMessage(data.message,"error");
+
+}
+
+}catch(err){
+
+showMessage("فشل الاتصال","error");
+
+}
+
+}
+
+async function chargeUser(){
+
+const target = document.getElementById("targetUser").value;
+
+const amount = document.getElementById("chargeAmount").value;
+
+try{
+
+const response = await fetch(API_BASE + "/admin/charge_user",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+telegram_id:currentUser.telegram_id,
+
+target_user:target,
+
+amount
+
+})
+
+});
+
+const data = await response.json();
+
+showMessage(data.message || "تم الشحن");
+
+}catch(err){
+
+showMessage("فشل الاتصال","error");
+
+}
+
+}
+
+function logout(){
+
+location.reload();
+
+}
+
+setInterval(()=>{
+
+const users = Math.floor(Math.random()*100)+150;
+
+document.getElementById("onlineUsers").innerText = users;
+
+},10000);
+
+</script>
+
+</body>
+</html>
