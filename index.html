@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ICHANCY MONSTER EDITION - آمنة ومحترفة</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Tahoma', 'Segoe UI', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+body {
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: white;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 15px;
+}
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,215,0,0.3);
+}
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: gold;
+    text-shadow: 0 0 10px gold;
+}
+.balance-box {
+    background: #000000aa;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-weight: bold;
+    color: gold;
+    backdrop-filter: blur(5px);
+}
+.stats {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+.wheel-area {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: auto;
+}
+@media (min-width: 480px) {
+    .wheel-area { width: 320px; height: 320px; }
+}
+#wheelCanvas {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255,215,0,0.4);
+    background: #0f172a;
+    transition: transform 4s cubic-bezier(0.2, 0.9, 0.1, 1);
+}
+.pointer {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-top: 40px solid gold;
+    z-index: 15;
+    filter: drop-shadow(0 0 8px gold);
+}
+.spin-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: none;
+    font-weight: bold;
+    background: radial-gradient(circle, gold, #f97316);
+    cursor: pointer;
+    z-index: 20;
+    font-size: 18px;
+    box-shadow: 0 0 20px gold;
+}
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+.controls button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 40px;
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid rgba(255,215,0,0.3);
+}
+.message {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 20px;
+    text-align: center;
+    display: none;
+}
+.success { background: #14532d; }
+.error { background: #7f1d1d; }
+.login-screen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.96);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+}
+.login-card {
+    width: 90%;
+    max-width: 360px;
+    background: #0f172a;
+    padding: 30px;
+    border-radius: 35px;
+    border: 1px solid gold;
+    box-shadow: 0 0 35px rgba(255,215,0,0.2);
+}
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: gold;
+}
+.login-card input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 50px;
+    background: #1e293b;
+    color: white;
+    font-size: 15px;
+}
+.login-card button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 50px;
+    background: gold;
+    font-weight: bold;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.admin-panel {
+    margin-top: 25px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    border-radius: 25px;
+    display: none;
+    border: 1px solid gold;
+}
+.admin-panel h3 {
+    margin-bottom: 15px;
+    color: gold;
+    text-align: center;
+}
+.admin-panel input, .admin-panel select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: none;
+    border-radius: 40px;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+}
+.admin-panel button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 40px;
+    background: gold;
+    font-weight: bold;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+.fake-popup {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    background: #0f172a;
+    padding: 12px 18px;
+    border-radius: 40px;
+    border-right: 4px solid gold;
+    z-index: 99999;
+    animation: fadeUp 0.4s ease;
+    font-size: 13px;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.king-scene {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 999999;
+}
+.king-scene h1 {
+    font-size: 38px;
+    color: gold;
+    margin-top: 20px;
+    text-shadow: 0 0 20px gold;
+}
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+    <div class="login-card">
+        <h2>⚜️ ICHANCY MONSTER ⚜️</h2>
+        <input type="text" id="loginUsername" placeholder="اسم المستخدم">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور">
+        <button onclick="doLogin()">🔐 تسجيل دخول</button>
+        <button onclick="doSignup()">➕ إنشاء حساب</button>
+    </div>
+</div>
+
+<div class="king-scene" id="kingScene">
+    <h1>🎉 JACKPOT 🎉</h1>
+    <p style="color:gold; margin-top:10px;">تهانينا! فوز أسطوري</p>
+</div>
+
+<div class="container">
+    <div class="topbar">
+        <div class="logo">👑 ICHANCY MONSTER</div>
+        <div class="balance-box">💰 <span id="balance">0</span></div>
+    </div>
+    <div class="stats">
+        <div>🟢 المتصلون: <span id="onlineUsers">189</span></div>
+        <div>🏆 آخر فائز: <span id="lastWinner">---</span></div>
+    </div>
+
+    <div class="wheel-area">
+        <div class="pointer"></div>
+        <canvas id="wheelCanvas" width="500" height="500"></canvas>
+        <button class="spin-btn" id="spinBtn">🎡 SPIN</button>
+    </div>
+
+    <div class="controls">
+        <button id="giftBtn">🎁 كود هدية</button>
+        <button id="withdrawBtn">💸 سحب</button>
+        <button id="logoutBtn">🚪 خروج</button>
+    </div>
+
+    <div id="messageBox" class="message"></div>
+
+    <div id="adminPanel" class="admin-panel">
+        <h3>👑 لوحة المدير الآمنة</h3>
+        <input type="number" id="giftAmount" placeholder="قيمة الكود (ل.س)">
+        <button id="createGiftCodeBtn">🎫 إنشاء كود هدية</button>
+        <input type="text" id="targetUserId" placeholder="اسم المستخدم أو ID">
+        <input type="number" id="chargeSum" placeholder="مبلغ الشحن">
+        <button id="chargeUserBtn">💎 شحن رصيد مستخدم</button>
+        <button id="backupUsersBtn">📀 نسخة احتياطية (JSON)</button>
+        <input type="file" id="restoreFile" accept=".json" style="display:none;">
+        <button id="restoreBackupBtn">🔄 استعادة نسخة</button>
+    </div>
+</div>
+
+<audio id="spinAudio" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
+<audio id="winAudio" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
+
+<script>
+    // ======================== إعدادات العجلة (ست قطع - تظهر الأرقام بوضوح) ==================
+    const SEGMENTS = [
+        { name: "💀 0", value: 0, color: "#111827" },
+        { name: "💰 1000", value: 1000, color: "#b45309" },
+        { name: "💀 0", value: 0, color: "#1e293b" },
+        { name: "💎 5000", value: 5000, color: "#d97706" },
+        { name: "💀 0", value: 0, color: "#111827" },
+        { name: "🔥 15000", value: 15000, color: "#ea580c" }
+    ];
+    const SEG_ANGLE = 360 / SEGMENTS.length;
+    let currentRotation = 0;
+    let spinning = false;
+    let canvas = document.getElementById('wheelCanvas');
+    let ctx = canvas.getContext('2d');
+
+    // ======================== قاعدة البيانات (ملف ذاكرة خارجي عبر localStorage + ملف JSON للنسخ الاحتياطي) ==================
+    let users = JSON.parse(localStorage.getItem('ichancy_users')) || {};
+    let giftCodes = JSON.parse(localStorage.getItem('ichancy_giftCodes')) || {};
+    let currentUser = null;
+
+    // إعدادات سرية: الحد الأقصى للربح لكل مستخدم 15000 ليرة
+    const MAX_WIN_PER_SPIN = 15000;
+    const GAME_COST = 1000;
+
+    function saveToLocal() {
+        localStorage.setItem('ichancy_users', JSON.stringify(users));
+        localStorage.setItem('ichancy_giftCodes', JSON.stringify(giftCodes));
+    }
+
+    // ======================== رسم العجلة بشكل احترافي ==================
+    function drawWheel() {
+        const size = canvas.width;
+        const center = size / 2;
+        const radius = size / 2 - 12;
+        ctx.clearRect(0, 0, size, size);
+        for (let i = 0; i < SEGMENTS.length; i++) {
+            const start = (i * SEG_ANGLE + currentRotation) * Math.PI / 180;
+            const end = ((i + 1) * SEG_ANGLE + currentRotation) * Math.PI / 180;
+            ctx.beginPath();
+            ctx.moveTo(center, center);
+            ctx.arc(center, center, radius, start, end);
+            ctx.fillStyle = SEGMENTS[i].color;
+            ctx.fill();
+            ctx.save();
+            ctx.translate(center, center);
+            ctx.rotate((start + end) / 2);
+            ctx.fillStyle = "#FFD966";
+            ctx.font = "bold 18px 'Segoe UI'";
+            ctx.fillText(SEGMENTS[i].name, radius / 2 - 15, 8);
+            ctx.restore();
+            ctx.strokeStyle = "#fbbf24";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(center, center);
+            ctx.arc(center, center, radius, start, end);
+            ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.arc(center, center, 14, 0, 2 * Math.PI);
+        ctx.fillStyle = "#FFD700";
+        ctx.fill();
+    }
+
+    drawWheel();
+
+    function showMessage(msg, isError = false) {
+        const box = document.getElementById('messageBox');
+        box.innerHTML = msg;
+        box.className = `message ${isError ? 'error' : 'success'}`;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 3000);
+    }
+
+    function updateBalanceUI() {
+        document.getElementById('balance').innerText = currentUser.balance.toLocaleString();
+        if (!currentUser.isAdmin && users[currentUser.name]) {
+            users[currentUser.name].balance = currentUser.balance;
+            saveToLocal();
+        }
+    }
+
+    // ======================== تسجيل الدخول وإنشاء حساب ==================
+    function doLogin() {
+        const username = document.getElementById('loginUsername').value.trim();
+        const pass = document.getElementById('loginPassword').value.trim();
+        if (!username || !pass) { showMessage("املأ جميع الحقول", true); return; }
+
+        // المدير الخاص: admin / admin0999
+        if (username === "admin" && pass === "admin0999") {
+            currentUser = { name: "admin", balance: 0, isAdmin: true };
+            document.getElementById('balance').innerText = "0";
+            document.getElementById('adminPanel').style.display = "block";
+            document.getElementById('loginScreen').style.display = "none";
+            showMessage("✅ مرحباً أيها المدير");
+            return;
+        }
+
+        if (users[username] && users[username].password === pass) {
+            currentUser = { name: username, balance: users[username].balance, isAdmin: false };
+            document.getElementById('balance').innerText = currentUser.balance;
+            document.getElementById('loginScreen').style.display = "none";
+            document.getElementById('adminPanel').style.display = "none";
+            showMessage(`مرحباً ${username}`);
+        } else {
+            showMessage("اسم المستخدم أو كلمة المرور غير صحيحة", true);
+        }
+    }
+
+    function doSignup() {
+        const username = document.getElementById('loginUsername').value.trim();
+        const pass = document.getElementById('loginPassword').value.trim();
+        if (!username || !pass) { showMessage("املأ جميع الحقول", true); return; }
+        if (users[username]) { showMessage("الاسم موجود مسبقاً", true); return; }
+        // الرصيد يبدأ من 0 كما طلبت
+        users[username] = { password: pass, balance: 0, totalWon: 0 };
+        saveToLocal();
+        showMessage("تم إنشاء الحساب، رصيدك 0 ل.س");
+    }
+
+    function logout() {
+        currentUser = null;
+        document.getElementById('loginScreen').style.display = "flex";
+        document.getElementById('adminPanel').style.display = "none";
+        location.reload();
+    }
+
+    // ======================== دوران العجلة (يتوقف فقط عند الأقسام ذات القيمة 0) ==================
+    function spinWheel() {
+        if (spinning) return;
+        if (!currentUser) { showMessage("سجل الدخول أولاً", true); return; }
+        if (currentUser.balance < GAME_COST) { showMessage(`الرصيد لا يكفي، تحتاج ${GAME_COST} ل.س`, true); return; }
+
+        spinning = true;
+        const spinSound = document.getElementById('spinAudio');
+        if (spinSound) spinSound.play().catch(e=>{});
+
+        // خصم تكلفة اللعبة
+        currentUser.balance -= GAME_COST;
+        updateBalanceUI();
+
+        // نقوم بالتوقف فقط عند قسمين من الأقسام ذات القيمة 0 (الفهرسة 0,2,4)
+        const zeroIndices = [0, 2, 4];
+        const targetZeroIndex = zeroIndices[Math.floor(Math.random() * zeroIndices.length)];
+        const targetAngle = (targetZeroIndex * SEG_ANGLE) + (SEG_ANGLE / 2);
+        const currentAngle = (360 - (currentRotation % 360)) % 360;
+        let delta = (targetAngle - currentAngle + 360) % 360;
+        let spinDeg = 360 * 8 + delta;
+        const newRotation = currentRotation + spinDeg;
+
+        const wheelElem = canvas;
+        wheelElem.style.transition = "transform 4s cubic-bezier(0.2, 0.9, 0.1, 1)";
+        wheelElem.style.transform = `rotate(${newRotation}deg)`;
+
+        setTimeout(() => {
+            currentRotation = newRotation % 360;
+            wheelElem.style.transition = "";
+            wheelElem.style.transform = `rotate(${currentRotation}deg)`;
+            drawWheel();
+
+            // العجلة توقفت عند صفر -> لا ربح
+            const stoppedSegment = SEGMENTS[targetZeroIndex];
+            const prizeValue = stoppedSegment.value;
+
+            if (prizeValue > 0 && prizeValue <= MAX_WIN_PER_SPIN) {
+                // نضمن أن الربح لا يتجاوز 15000
+                currentUser.balance += prizeValue;
+                if (users[currentUser.name] && !currentUser.isAdmin) {
+                    users[currentUser.name].totalWon = (users[currentUser.name].totalWon || 0) + prizeValue;
+                }
+                updateBalanceUI();
+                showMessage(`🎉 فوز بقيمة ${prizeValue.toLocaleString()} ل.س`, false);
+                const winAudio = document.getElementById('winAudio');
+                if (winAudio) winAudio.play().catch(e=>{});
+                document.getElementById('lastWinner').innerText = currentUser.name;
+                if (prizeValue >= 15000) {
+                    document.getElementById('kingScene').style.display = "flex";
+                    setTimeout(() => document.getElementById('kingScene').style.display = "none", 4000);
+                }
+            } else {
+                showMessage("😢 لم يحالفك الحظ… 0 ل.س", true);
+            }
+            spinning = false;
+        }, 4000);
+    }
+
+    // ======================== كود الهدية (يظهر ويمكن نسخه بسهولة) ==================
+    function generateGiftCode() {
+        if (!currentUser || !currentUser.isAdmin) { showMessage("غير مصرح", true); return; }
+        const amount = parseInt(document.getElementById('giftAmount').value);
+        if (!amount || amount <= 0) { showMessage("أدخل قيمة صحيحة", true); return; }
+        let code = "GIFT" + Math.random().toString(36).substring(2, 10).toUpperCase();
+        giftCodes[code] = { value: amount, used: false, createdBy: "admin" };
+        saveToLocal();
+
+        // عرض الكود بشكل ثابت حتى يتمكن المدير من نسخه
+        const resultDiv = document.createElement('div');
+        resultDiv.style.position = 'fixed';
+        resultDiv.style.bottom = '30%';
+        resultDiv.style.left = '10%';
+        resultDiv.style.right = '10%';
+        resultDiv.style.backgroundColor = '#0f172a';
+        resultDiv.style.border = '2px solid gold';
+        resultDiv.style.borderRadius = '40px';
+        resultDiv.style.padding = '20px';
+        resultDiv.style.zIndex = '999999';
+        resultDiv.style.textAlign = 'center';
+        resultDiv.style.boxShadow = '0 0 30px gold';
+        resultDiv.innerHTML = `<div style="color:gold;font-size:20px;">🎁 كود الهدية</div>
+                               <div style="font-size:24px;font-weight:bold;margin:10px 0;background:#000;padding:10px;border-radius:30px;">${code}</div>
+                               <div style="color:white;">💰 القيمة: ${amount.toLocaleString()} ل.س</div>
+                               <button id="copyCodeBtn" style="margin-top:15px;background:gold;border:none;padding:10px 30px;border-radius:40px;">📋 نسخ</button>
+                               <button id="closeCodeBtn" style="margin-top:10px;background:#333;border:none;padding:8px 20px;border-radius:40px;">إغلاق</button>`;
+        document.body.appendChild(resultDiv);
+        document.getElementById('copyCodeBtn').onclick = () => {
+            navigator.clipboard.writeText(code);
+            showMessage("✅ تم نسخ الكود");
+        };
+        document.getElementById('closeCodeBtn').onclick = () => resultDiv.remove();
+        document.getElementById('giftAmount').value = '';
+    }
+
+    // استخدام كود الهدية من قبل المستخدم
+    function redeemGiftCodeUI() {
+        if (!currentUser) { showMessage("سجل الدخول أولاً", true); return; }
+        let code = prompt("🎫 أدخل كود الهدية:");
+        if (!code) return;
+        code = code.trim().toUpperCase();
+        if (giftCodes[code] && !giftCodes[code].used) {
+            const val = giftCodes[code].value;
+            giftCodes[code].used = true;
+            giftCodes[code].usedBy = currentUser.name;
+            currentUser.balance += val;
+            updateBalanceUI();
+            saveToLocal();
+            showMessage(`✅ تم تفعيل الكود! +${val.toLocaleString()} ل.س`);
+        } else {
+            showMessage("❌ كود غير صالح أو مستخدم", true);
+        }
+    }
+
+    // ======================== سحب الرصيد (حد أدنى 80000) ==================
+    function requestWithdraw() {
+        if (!currentUser) { showMessage("سجل الدخول أولاً", true); return; }
+        if (currentUser.balance < 80000) {
+            showMessage("الحد الأدنى للسحب 80,000 ل.س", true);
+            return;
+        }
+        let code = "WD" + Math.random().toString(36).substring(2, 10).toUpperCase();
+        showMessage(`✅ تم إنشاء كود السحب: ${code} (تواصل مع الدعم)`, false);
+    }
+
+    // ======================== شحن رصيد المستخدمين (للمدير) باستخدام الاسم أو ID ==================
+    function adminChargeUser() {
+        if (!currentUser || !currentUser.isAdmin) { showMessage("غير مصرح", true); return; }
+        let target = document.getElementById('targetUserId').value.trim();
+        let amount = parseInt(document.getElementById('chargeSum').value);
+        if (!target || !amount || amount <= 0) { showMessage("أدخل اسم المستخدم ومبلغ صحيح", true); return; }
+        if (users[target]) {
+            users[target].balance += amount;
+            saveToLocal();
+            showMessage(`✅ تم شحن ${amount.toLocaleString()} ل.س للمستخدم ${target}`);
+        } else {
+            showMessage("المستخدم غير موجود", true);
+        }
+        document.getElementById('chargeSum').value = '';
+    }
+
+    // ======================== نسخة احتياطية JSON ==================
+    function backupUsers() {
+        const data = JSON.stringify({ users, giftCodes }, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `ichancy_backup_${new Date().toISOString().slice(0,19)}.json`;
+        a.click();
+        showMessage("تم تحميل النسخة الاحتياطية");
+    }
+
+    function restoreBackup() {
+        const input = document.getElementById('restoreFile');
+        input.click();
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (data.users) users = data.users;
+                    if (data.giftCodes) giftCodes = data.giftCodes;
+                    saveToLocal();
+                    showMessage("✅ تم استعادة النسخة بنجاح");
+                    if (currentUser && !currentUser.isAdmin) {
+                        const updated = users[currentUser.name];
+                        if (updated) currentUser.balance = updated.balance;
+                        updateBalanceUI();
+                    }
+                } catch(e) { showMessage("الملف تالف", true); }
+            };
+            reader.readAsText(file);
+        };
+    }
+
+    // ======================== أحداث وهمية + تفاعلية ==================
+    setInterval(() => {
+        document.getElementById('onlineUsers').innerText = Math.floor(Math.random() * 140) + 130;
+    }, 5000);
+
+    const fakeNamesList = ["أسد", "ريم", "ليث", "نور", "كينغ", "سيف"];
+    setInterval(() => {
+        let div = document.createElement('div');
+        div.className = 'fake-popup';
+        let name = fakeNamesList[Math.floor(Math.random() * fakeNamesList.length)];
+        let val = [5000, 10000, 15000][Math.floor(Math.random() * 3)];
+        div.innerHTML = `🎉 ${name} ربح ${val.toLocaleString()} ل.س من العجلة!`;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 4500);
+    }, 13000);
+
+    // ربط الأزرار
+    document.getElementById('spinBtn').onclick = spinWheel;
+    document.getElementById('giftBtn').onclick = () => redeemGiftCodeUI();
+    document.getElementById('withdrawBtn').onclick = () => requestWithdraw();
+    document.getElementById('logoutBtn').onclick = () => logout();
+    document.getElementById('createGiftCodeBtn').onclick = () => generateGiftCode();
+    document.getElementById('chargeUserBtn').onclick = () => adminChargeUser();
+    document.getElementById('backupUsersBtn').onclick = () => backupUsers();
+    document.getElementById('restoreBackupBtn').onclick = () => restoreBackup();
+
+    drawWheel();
+    if (!currentUser) document.getElementById('loginScreen').style.display = "flex";
+</script>
+</body>
+</html>
